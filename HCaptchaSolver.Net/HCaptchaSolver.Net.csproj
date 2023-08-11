@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ClarifaiGrpc" Version="9.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Connections.Client" Version="8.0.0-preview.6.23329.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="8.0.0-preview.6.23329.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
