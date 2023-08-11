@@ -13,14 +13,13 @@ namespace HCaptchaSolver.Net.Utils
 {
     internal class API
     {
-        public static HttpClient Client = new HttpClient(new HttpClientHandler() { UseCookies = true, CookieContainer = new CookieContainer()});
-        public static async Task<dynamic> CheckSiteKey(string version, string host, string sitekey)
+        public static async Task<dynamic> CheckSiteKey(HttpClient Client, string version, string host, string sitekey)
         {
             HttpResponseMessage response = await Client.PostAsync($"https://api2.hcaptcha.com/checksiteconfig?v={version}&host={host}&sitekey={sitekey}&sc=1&swa=1&spst=0", null);
             return JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
         }
 
-        public static async Task<string> GetHsw(string req)
+        public static async Task<string> GetHsw(HttpClient Client, string req)
         {
             string payload = JsonConvert.SerializeObject(new
             {
@@ -32,7 +31,7 @@ namespace HCaptchaSolver.Net.Utils
             return JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result)["result"];
         }
 
-        public static async Task<dynamic> GetCaptcha(string version, string host, string sitekey, string c, string n, string motiondata)
+        public static async Task<dynamic> GetCaptcha(HttpClient Client, string version, string host, string sitekey, string c, string n, string motiondata)
         {
 
             var regdata = new[]
@@ -50,13 +49,7 @@ namespace HCaptchaSolver.Net.Utils
             return JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
         }
 
-        public static async Task<string> GetVersion()
-        {
-            MatchCollection matches = Regex.Matches(Client.GetAsync("https://js.hcaptcha.com/1/api.js").Result.Content.ReadAsStringAsync().Result, "@\"captcha\\\\/v1\\\\/([a-z0-9]{4,8})\\\\/static\"");
-            return matches[0].Groups[1].Value;
-        }
-
-        public static async Task<dynamic> SubmitCaptcha(string version, string host, string sitekey, string key, string c, string n, string motiondata, Dictionary<string, string> answers)
+        public static async Task<dynamic> SubmitCaptcha(HttpClient Client, string version, string host, string sitekey, string key, string c, string n, string motiondata, Dictionary<string, string> answers)
         {
             string link = $"https://hcaptcha.com/checkcaptcha/{sitekey}/{key}";
             string payload = JsonConvert.SerializeObject(new

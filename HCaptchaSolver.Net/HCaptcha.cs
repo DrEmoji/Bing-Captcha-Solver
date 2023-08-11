@@ -13,10 +13,10 @@ namespace HCaptchaSolver.Net
     {
         public static async Task<string> Solve(string website, string widgetid, string host, string sitekey)
         {
-            API.Client = new HttpClient(new HttpClientHandler() { UseCookies = true, CookieContainer = new CookieContainer() });
-            API.Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
-            API.Client.DefaultRequestHeaders.Add("Origin", "https://newassets.hcaptcha.com");
-            API.Client.DefaultRequestHeaders.Add("Referer", "https://newassets.hcaptcha.com/");
+            HttpClient Client = new HttpClient(new HttpClientHandler() { UseCookies = true, CookieContainer = new CookieContainer() });
+            Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
+            Client.DefaultRequestHeaders.Add("Origin", "https://newassets.hcaptcha.com");
+            Client.DefaultRequestHeaders.Add("Referer", "https://newassets.hcaptcha.com/");
             WebProxy Proxy = new WebProxy
             {
                 Address = new Uri("http://us.smartproxy.com:10000"),
@@ -34,19 +34,19 @@ namespace HCaptchaSolver.Net
             string motiondata = "";
             while (!validcaptcha)
             {
-                dynamic sitedata = API.CheckSiteKey(version, host, sitekey).Result;
+                dynamic sitedata = API.CheckSiteKey(Client,version, host, sitekey).Result;
                 string nn = sitedata["c"]["req"].ToString();
                 c = "{\"type\":\"hsw\",\"req\":\"" + nn + "\"}";
-                hsw = API.GetHsw(nn).Result;
+                hsw = API.GetHsw(Client, nn).Result;
                 motiondata = Extra.GetMotionData(website,widgetid);
-                captcha = API.GetCaptcha(version,host, sitekey, c, hsw, motiondata).Result;
+                captcha = API.GetCaptcha(Client, version, host, sitekey, c, hsw, motiondata).Result;
                 if (captcha["request_type"].ToString() == "image_label_binary") { validcaptcha = true; }
             }
             //Console.WriteLine(captcha);
             string key = captcha["key"];
             string n = captcha["c"]["req"].ToString();
             c = "{\"type\":\"hsw\",\"req\":\"" + n + "\"}";
-            hsw = API.GetHsw(n).Result;
+            hsw = API.GetHsw(Client, n).Result;
             string question = captcha["requester_question"]["en"].ToString();
             string searchText = "Please click each image containing a ";
             int startIndex = question.IndexOf(searchText);
@@ -58,7 +58,7 @@ namespace HCaptchaSolver.Net
                 string[] answer = Recognition.Recognise(task, keyword);
                 answers.Add(answer[0], answer[1]);
             }
-            dynamic captcharesponse = API.SubmitCaptcha(version,host, sitekey, key, c, hsw, motiondata, answers).Result;
+            dynamic captcharesponse = API.SubmitCaptcha(Client, version, host, sitekey, key, c, hsw, motiondata, answers).Result;
             if (captcharesponse["pass"] == true)
             {
                 return captcharesponse["generated_pass_UUID"];

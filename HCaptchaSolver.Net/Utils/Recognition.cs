@@ -13,13 +13,6 @@ namespace HCaptchaSolver.Net.Utils
 {
     internal class Recognition
     {
-        public static V2.V2Client client = new V2.V2Client(ClarifaiChannel.Grpc());
-
-        public static Metadata metadata = new Metadata
-        {
-            {"Authorization", "Key b4ff8ef1e16447ad9d61e649d829aca5"}
-        };
-
         static bool FindMatchingSubword(string keyword, string predictedConcepts)
         {
             string[] conceptsArray = predictedConcepts.Split('\n');
@@ -48,6 +41,11 @@ namespace HCaptchaSolver.Net.Utils
 
         public static string[] Recognise(dynamic task, string keyword)
         {
+             V2.V2Client client = new V2.V2Client(ClarifaiChannel.Grpc());
+             Metadata metadata = new Metadata
+             {
+                {"Authorization", "Key b4ff8ef1e16447ad9d61e649d829aca5"}
+            };
             string imagelink = task["datapoint_uri"].ToString();
             string taskkey = task["task_key"].ToString();
             var response = client.PostModelOutputs(

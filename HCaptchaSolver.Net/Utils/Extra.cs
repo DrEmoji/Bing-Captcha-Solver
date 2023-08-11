@@ -83,14 +83,14 @@ namespace HCaptchaSolver.Net.Utils
                 "}";
         }
 
-        public static byte[] DownloadImage(string imageUrl)
+        public static byte[] DownloadImage(HttpClient Client, string imageUrl)
         {
-            return API.Client.GetAsync(imageUrl).Result.Content.ReadAsByteArrayAsync().Result;
+            return Client.GetAsync(imageUrl).Result.Content.ReadAsByteArrayAsync().Result;
         }
 
-        public static string ImageToBase64(string imageUrl)
+        public static string ImageToBase64(HttpClient Client, string imageUrl)
         {
-            return Convert.ToBase64String(DownloadImage(imageUrl));
+            return Convert.ToBase64String(DownloadImage(Client, imageUrl));
         }
         public static int GetUniqueInt(int min, int max)
         {
